@@ -1,0 +1,13 @@
+{
+  "name": "kommo-sales-dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard de vendas ganhas em tempo real para Kommo via N8N",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
