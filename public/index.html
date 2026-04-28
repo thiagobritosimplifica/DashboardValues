@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vendas Ganhas</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 1300px;
+    height: 200px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .widget {
+    width: 1300px;
+    height: 200px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+  }
+  .value {
+    font-size: 96px;
+    font-weight: 700;
+    color: #1a3a6b;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="value" id="number">R$480.000</div>
+</div>
+<script>
+  const numberEl = document.getElementById('number');
+  let currentTotal = 0;
+
+  function fmt(val) {
+    return 'R$' + new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(val);
+  }
+
+  function animateValue(from, to, duration = 900) {
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      numberEl.textContent = fmt(from + (to - from) * ease);
+      if (p < 1) requestAnimationFrame(tick);
+      else numberEl.textContent = fmt(to);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function connect() {
+    const es = new EventSource('/events');
+    es.onmessage = (e) => {
+      try {
+        const s = JSON.parse(e.data);
+        animateValue(currentTotal, s.total);
+        currentTotal = s.total;
+      } catch(err) {}
+    };
+    es.onerror = () => { es.close(); setTimeout(connect, 5000); };
+  }
+
+  connect();
+</script>
+</body>
+</html>
